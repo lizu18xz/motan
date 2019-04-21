@@ -129,6 +129,34 @@ public class StandardThreadExecutor extends ThreadPoolExecutor {
 	protected void afterExecute(Runnable r, Throwable t) {
 		submittedTasksCount.decrementAndGet();
 	}
+
+
+	public static void main(String[] args) {
+
+		StandardThreadExecutor mySelfThreadPool=new StandardThreadExecutor(10, 50, 60,
+				TimeUnit.SECONDS,50,
+				new DefaultThreadFactory("test")
+
+		);
+		for ( int i=0;i<1000;i++){
+			final int finalI = i;
+			mySelfThreadPool.execute(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						System.out.println(finalI + " is running."+Thread.currentThread().getName());
+						Thread.sleep(1000);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+		mySelfThreadPool.shutdown();
+	}
+
+
+
 }
 
 /**

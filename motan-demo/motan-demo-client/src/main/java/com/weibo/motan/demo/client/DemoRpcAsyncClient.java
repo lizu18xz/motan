@@ -10,7 +10,8 @@
  * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
- */
+ *//*
+
 package com.weibo.motan.demo.client;
 
 import org.springframework.context.ApplicationContext;
@@ -23,14 +24,16 @@ import com.weibo.motan.demo.service.MotanDemoServiceAsync;
 
 public class DemoRpcAsyncClient {
 
-    /**
+    */
+/**
      * 使用motan异步调用方法： 1、在声明的service上增加@MotanAsync注解。 如MotanDemoService
      * 2、在项目pom.xml中增加build-helper-maven-plugin，用来把自动生成类的目录设置为source path。 参见motan-demo-api模块的pom声明。
      * 也可以不使用plugin，手动将target/generated-sources/annotations目录设置为source path。
      * 3、在client配置的motan:referer标签中配置interface为自动生成的以Async为后缀的对应service类。
      * 参见本模块的motan_demo_async_client.xml
      * 
-     */
+     *//*
+
     public static void main(String[] args) {
         ApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] {"classpath:motan_demo_async_client.xml"});
 
@@ -74,3 +77,4 @@ public class DemoRpcAsyncClient {
     }
 
 }
+*/

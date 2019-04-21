@@ -64,6 +64,7 @@ public class NettyChannel implements Channel {
             response.addListener(new FutureListener() {
                 @Override
                 public void operationComplete(Future future) throws Exception {
+                    //System.out.println("完全结束");
                     if (future.isSuccess() || (future.isDone() && ExceptionUtil.isBizException(future.getException()))) {
                         // 成功的调用
                         nettyClient.resetErrorCount();

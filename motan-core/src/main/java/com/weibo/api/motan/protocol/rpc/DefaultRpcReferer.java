@@ -41,7 +41,7 @@ public class DefaultRpcReferer<T> extends AbstractReferer<T> {
                 ExtensionLoader.getExtensionLoader(EndpointFactory.class).getExtension(
                         url.getParameter(URLParamType.endpointFactory.getName(), URLParamType.endpointFactory.getValue()));
 
-        client = endpointFactory.createClient(url);
+        client = endpointFactory.createClient(url);//nettyClient
     }
 
     @Override

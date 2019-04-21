@@ -114,16 +114,20 @@ public class RefererConfig<T> extends AbstractRefererConfig {
                     interfaceClass.getName()));
         }
 
+        //具体到某个接口里面方法的配置
         checkInterfaceAndMethods(interfaceClass, methods);
 
         clusterSupports = new ArrayList<>(protocols.size());
         List<Cluster<T>> clusters = new ArrayList<>(protocols.size());
         String proxy = null;
 
+        //根据SPI机制获取到 SimpleConfigHandler
         ConfigHandler configHandler = ExtensionLoader.getExtensionLoader(ConfigHandler.class).getExtension(MotanConstants.DEFAULT_VALUE);
 
+        //获取注册中心的URL
         List<URL> registryUrls = loadRegistryUrls();
         String localIp = getLocalHostAddress(registryUrls);
+
         for (ProtocolConfig protocol : protocols) {
             Map<String, String> params = new HashMap<>();
             params.put(URLParamType.nodeType.getName(), MotanConstants.NODE_TYPE_REFERER);
@@ -133,8 +137,12 @@ public class RefererConfig<T> extends AbstractRefererConfig {
             collectConfigParams(params, protocol, basicReferer, extConfig, this);
             collectMethodConfigParams(params, this.getMethods());
 
+            //获取路径
             String path = StringUtils.isBlank(serviceInterface) ? interfaceClass.getName() : serviceInterface;
+            //设置调用服务的URL  motan  ip 0 interfaceClass.getName() params
             URL refUrl = new URL(protocol.getName(), localIp, MotanConstants.DEFAULT_INT_VALUE, path, params);
+
+            //ClusterSupport 构造 Cluster
             ClusterSupport<T> clusterSupport = createClusterSupport(refUrl, configHandler, registryUrls);
 
             clusterSupports.add(clusterSupport);
@@ -178,7 +186,9 @@ public class RefererConfig<T> extends AbstractRefererConfig {
                 }
             }
             regUrls.add(regUrl);
-        } else { // 通过注册中心配置拼装URL，注册中心可能在本地，也可能在远端
+        } else {
+
+            // 通过注册中心配置拼装URL，注册中心可能在本地，也可能在远端
             if (registryUrls == null || registryUrls.isEmpty()) {
                 throw new IllegalStateException(
                         String.format(
@@ -190,6 +200,7 @@ public class RefererConfig<T> extends AbstractRefererConfig {
             }
         }
 
+        //给注册中心的URL新增属性embed:请求的refUrl
         for (URL url : regUrls) {
             url.addParameter(URLParamType.embed.getName(), StringTools.urlEncode(refUrl.toFullStr()));
         }

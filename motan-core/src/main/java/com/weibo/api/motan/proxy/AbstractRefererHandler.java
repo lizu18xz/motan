@@ -73,7 +73,10 @@ public class AbstractRefererHandler<T> {
             Response response;
             boolean throwException = Boolean.parseBoolean(cluster.getUrl().getParameter(URLParamType.throwException.getName(), URLParamType.throwException.getValue()));
             try {
+
+                //调用 服务 处理结果返回,同步和异步两种
                 response = cluster.call(request);
+                //异步
                 if (async) {
                     if (response instanceof ResponseFuture) {
                         ((ResponseFuture) response).setReturnType(returnType);

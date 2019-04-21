@@ -66,6 +66,11 @@ public class NettyClientTest {
                 Request request = (Request) message;
                 DefaultResponse response = new DefaultResponse();
                 response.setRequestId(request.getRequestId());
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 response.setValue("method: " + request.getMethodName() + " requestId: " + request.getRequestId());
 
                 return response;
@@ -91,11 +96,14 @@ public class NettyClientTest {
         Response response;
         try {
             response = nettyClient.request(request);
+            System.out.println("开始获取数据");
             Object result = response.getValue();
 
             Assert.assertNotNull(result);
             Assert.assertEquals("method: " + request.getMethodName() + " requestId: " + request.getRequestId(), result);
+            System.out.println(result);
         } catch (MotanServiceException e) {
+            e.printStackTrace();
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(false);
@@ -117,8 +125,10 @@ public class NettyClientTest {
             Assert.assertNotNull(result);
             Assert.assertEquals("method: " + request.getMethodName() + " requestId: " + request.getRequestId(), result);
         } catch (MotanServiceException e) {
+            e.printStackTrace();
             assertTrue(false);
         } catch (Exception e) {
+            e.printStackTrace();
             assertTrue(false);
         }
 

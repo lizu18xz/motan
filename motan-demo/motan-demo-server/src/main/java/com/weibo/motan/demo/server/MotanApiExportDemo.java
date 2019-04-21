@@ -26,41 +26,36 @@ import com.weibo.motan.demo.service.MotanDemoService;
 public class MotanApiExportDemo {
 
     public static void main(String[] args) throws InterruptedException {
-        ServiceConfig<MotanDemoService> motanDemoService = new ServiceConfig<MotanDemoService>();
 
-        // 设置接口及实现类
-        motanDemoService.setInterface(MotanDemoService.class);
-        motanDemoService.setRef(new MotanDemoServiceImpl());
+            //1-初始化一个服务的配置
+            ServiceConfig<MotanDemoService> motanDemoService = new ServiceConfig<MotanDemoService>();
+            //2-设置接口及实现类
+            motanDemoService.setInterface(MotanDemoService.class);
+            motanDemoService.setRef(new MotanDemoServiceImpl());
+            // 配置服务的group以及版本号
+            motanDemoService.setGroup("motan-demo-rpc");
+            motanDemoService.setVersion("1.0");
 
-        // 配置服务的group以及版本号
-        motanDemoService.setGroup("motan-demo-rpc");
-        motanDemoService.setVersion("1.0");
+            //3-配置注册中心zk
+            RegistryConfig registry = new RegistryConfig();
+            registry.setRegProtocol("zookeeper");
+            registry.setAddress("192.168.88.129:2181");
+            motanDemoService.setRegistry(registry);
 
-        // 配置注册中心直连调用
-        RegistryConfig registry = new RegistryConfig();
+            //4-配置RPC协议
+            ProtocolConfig protocol = new ProtocolConfig();
+            protocol.setId("motan");
+            protocol.setName("motan");
 
-        //use local registry
-        registry.setRegProtocol("local");
+            motanDemoService.setProtocol(protocol);
+            //5-设置暴露的端口号
+            motanDemoService.setExport("motan:8004");
+            //6-暴露服务,等待客户端调用
+            motanDemoService.export();
+            MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true);
+            System.out.println("server start...");
 
-        // use ZooKeeper registry
-//        registry.setRegProtocol("zookeeper");
-//        registry.setAddress("127.0.0.1:2181");
 
-        // registry.setCheck("false"); //是否检查是否注册成功
-        motanDemoService.setRegistry(registry);
-
-        // 配置RPC协议
-        ProtocolConfig protocol = new ProtocolConfig();
-        protocol.setId("motan");
-        protocol.setName("motan");
-        motanDemoService.setProtocol(protocol);
-
-        motanDemoService.setExport("motan:8002");
-        motanDemoService.export();
-
-        MotanSwitcherUtil.setSwitcherValue(MotanConstants.REGISTRY_HEARTBEAT_SWITCHER, true);
-
-        System.out.println("server start...");
     }
 
 }

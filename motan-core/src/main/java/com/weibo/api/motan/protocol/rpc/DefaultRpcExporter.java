@@ -43,16 +43,19 @@ public class DefaultRpcExporter<T> extends AbstractExporter<T> {
     protected final ConcurrentHashMap<String, ProviderMessageRouter> ipPort2RequestRouter;
     protected final ConcurrentHashMap<String, Exporter<?>> exporterMap;
 
+    //很重要
     public DefaultRpcExporter(Provider<T> provider, URL url, ConcurrentHashMap<String, ProviderMessageRouter> ipPort2RequestRouter,
                               ConcurrentHashMap<String, Exporter<?>> exporterMap) {
         super(provider, url);
         this.exporterMap = exporterMap;
         this.ipPort2RequestRouter = ipPort2RequestRouter;
 
+        //将DefaultProvider加入到ProviderMessageRouter
         ProviderMessageRouter requestRouter = initRequestRouter(url);
         endpointFactory =
                 ExtensionLoader.getExtensionLoader(EndpointFactory.class).getExtension(
                         url.getParameter(URLParamType.endpointFactory.getName(), URLParamType.endpointFactory.getValue()));
+        //根据服务的url创建NettyServer
         server = endpointFactory.createServer(url, requestRouter);
     }
 
@@ -96,6 +99,8 @@ public class DefaultRpcExporter<T> extends AbstractExporter<T> {
 
     protected ProviderMessageRouter initRequestRouter(URL url) {
         String ipPort = url.getServerPortStr();
+
+        //处理客户端请求的时候会用到ProviderMessageRouter
         ProviderMessageRouter requestRouter = ipPort2RequestRouter.get(ipPort);
 
         if (requestRouter == null) {

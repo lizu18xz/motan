@@ -63,7 +63,7 @@ public class DefaultResponseFuture implements ResponseFuture {
     public void onSuccess(Response response) {
         this.result = response.getValue();
         this.processTime = response.getProcessTime();
-
+        //System.out.println("onSuccess:"+result);
         done();
     }
 
@@ -76,19 +76,20 @@ public class DefaultResponseFuture implements ResponseFuture {
 
     @Override
     public Object getValue() {
+        //System.out.println("getValue");
         synchronized (lock) {
             if (!isDoing()) {
-                return getValueOrThrowable();
+                return getValueOrThrowable();//如果不是在运行就报错
             }
-
-            if (timeout <= 0) {
+            //System.out.println("timeout:"+timeout);
+            if (timeout <= 0) {//超时时间
                 try {
                     lock.wait();
                 } catch (Exception e) {
                     cancel(new MotanServiceException(this.getClass().getName() + " getValue InterruptedException : "
                             + MotanFrameworkUtil.toString(request) + " cost=" + (System.currentTimeMillis() - createTime), e));
                 }
-
+                //System.out.println("<= 0  getValueOrThrowable");
                 return getValueOrThrowable();
             } else {
                 long waitTime = timeout - (System.currentTimeMillis() - createTime);
@@ -110,11 +111,12 @@ public class DefaultResponseFuture implements ResponseFuture {
                         }
                     }
                 }
-
+               //超过设置的超时时间不返回就报错
                 if (isDoing()) {
                     timeoutSoCancel();
                 }
             }
+            //System.out.println("getValueOrThrowable");
             return getValueOrThrowable();
         }
     }
@@ -245,11 +247,12 @@ public class DefaultResponseFuture implements ResponseFuture {
 
     protected boolean done() {
         synchronized (lock) {
-            if (!isDoing()) {
+            if (!isDoing()) {//默认doing   如果不是这个状态就返回
                 return false;
             }
-
-            state = FutureState.DONE;
+             //System.out.println("done");
+            state = FutureState.DONE;//运行完毕
+            //System.out.println("notifyAll");
             lock.notifyAll();
         }
 

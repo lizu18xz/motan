@@ -16,6 +16,7 @@
 
 package com.weibo.api.motan.transport.netty;
 
+import com.weibo.api.motan.rpc.*;
 import junit.framework.TestCase;
 
 import org.junit.Assert;
@@ -25,10 +26,6 @@ import org.junit.Test;
 import com.weibo.api.motan.codec.Codec;
 import com.weibo.api.motan.common.URLParamType;
 import com.weibo.api.motan.core.extension.ExtensionLoader;
-import com.weibo.api.motan.rpc.DefaultRequest;
-import com.weibo.api.motan.rpc.DefaultResponse;
-import com.weibo.api.motan.rpc.Request;
-import com.weibo.api.motan.rpc.URL;
 import com.weibo.api.motan.transport.Channel;
 import com.weibo.api.motan.transport.MessageHandler;
 import com.weibo.api.motan.util.RequestIdGenerator;
@@ -119,6 +116,7 @@ public class NettyExampleTest extends TestCase {
                 DefaultResponse response = new DefaultResponse();
                 response.setRequestId(request.getRequestId());
                 response.setValue("success");
+                System.out.println("==============================>");
                 return response;
             }
         });
@@ -134,11 +132,16 @@ public class NettyExampleTest extends TestCase {
         request.setParamtersDesc("void");
 
         try {
-            nettyClient.request(request);
+            System.out.println("***********************************");
+            ResponseFuture response= (ResponseFuture) nettyClient.request(request);
+
+            System.out.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$==============********88"+response.getValue());
             Assert.assertTrue(false);
         } catch (Exception e) {
+            //e.printStackTrace();
             Assert.assertTrue(e.getMessage().contains("framework decode error"));
         } finally {
+            System.out.println("================>000");
             nettyClient.close();
             nettyServer.close();
         }

@@ -50,7 +50,9 @@ public class SimpleConfigHandler implements ConfigHandler {
 
     @Override
     public <T> ClusterSupport<T> buildClusterSupport(Class<T> interfaceClass, List<URL> registryUrls) {
+        //初始化ClusterSupport,会根据embed属性获取请求的url
         ClusterSupport<T> clusterSupport = new ClusterSupport<T>(interfaceClass, registryUrls);
+        //执行init方法
         clusterSupport.init();
 
         return clusterSupport;
@@ -65,19 +67,26 @@ public class SimpleConfigHandler implements ConfigHandler {
     @Override
     public <T> Exporter<T> export(Class<T> interfaceClass, T ref, List<URL> registryUrls) {
 
+        //根据embed属性获取我们服务的URL地址
         String serviceStr = StringTools.urlDecode(registryUrls.get(0).getParameter(URLParamType.embed.getName()));
         URL serviceUrl = URL.valueOf(serviceStr);
 
         // export service
-        // 利用protocol decorator来增加filter特性
         String protocolName = serviceUrl.getParameter(URLParamType.protocol.getName(), URLParamType.protocol.getValue());
+
+        //根据 SPI 获取协议的具体实现类是   DefaultRpcProtocol
         Protocol orgProtocol = ExtensionLoader.getExtensionLoader(Protocol.class).getExtension(protocolName);
+
+        //创建 provider  ref是具体实现类，serviceUrl就是上文的服务url，interfaceClass就是服务接口, 返回 具体 实现类 DefaultProvider
         Provider<T> provider = getProvider(orgProtocol, ref, serviceUrl, interfaceClass);
 
+        //把DefaultRpcProtocol包装到ProtocolFilterDecorator里面
         Protocol protocol = new ProtocolFilterDecorator(orgProtocol);
+
+        //暴露服务,调用ProtocolFilterDecorator  里面的export方法  进行fliter处理
         Exporter<T> exporter = protocol.export(provider, serviceUrl);
 
-        // register service
+        //注册服务到注册中心
         register(registryUrls, serviceUrl);
 
         return exporter;

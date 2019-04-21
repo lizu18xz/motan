@@ -29,6 +29,12 @@ import java.lang.reflect.Method;
 /**
  * @author maijunsheng
  * @version 创建时间：2013-5-23
+ *
+ *provider具体的实现是DefaultProvider,在SimpleConfigHandler里面的export方法就已经被初始化
+ *
+ *  proxyImpl是具体实现类
+url就是上文的服务url
+clz就是服务接口
  */
 @SpiMeta(name = "motan")
 public class DefaultProvider<T> extends AbstractProvider<T> {
@@ -61,6 +67,7 @@ public class DefaultProvider<T> extends AbstractProvider<T> {
 
         boolean defaultThrowExceptionStack = URLParamType.transExceptionStack.getBooleanValue();
         try {
+            //调用具体的方法
             Object value = method.invoke(proxyImpl, request.getArguments());
             response.setValue(value);
         } catch (Exception e) {

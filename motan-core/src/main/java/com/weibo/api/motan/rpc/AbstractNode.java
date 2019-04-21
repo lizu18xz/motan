@@ -43,6 +43,7 @@ public abstract class AbstractNode implements Node {
             return;
         }
 
+        //调用DefaultRpcExporter里面的doInit方法
         boolean result = doInit();
 
         if (!result) {

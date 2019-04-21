@@ -106,7 +106,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
                 return null;
             }
 
-            // async request
+            // async request 异步
             response = channel.request(request);
         } catch (Exception e) {
             LoggerUtil.error("NettyClient request Error: url=" + url.getUri() + " " + MotanFrameworkUtil.toString(request), e);
@@ -135,7 +135,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
         if (async || !(response instanceof ResponseFuture)) {
             return response;
         }
-        return new DefaultResponse(response);
+        return new DefaultResponse(response);//同步获取
     }
 
     @Override
@@ -167,6 +167,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
                             @Override
                             public Object handle(Channel channel, Object message) {
                                 Response response = (Response) message;
+                                System.out.println("获取到message");
                                 ResponseFuture responseFuture = NettyClient.this.removeCallback(response.getRequestId());
 
                                 if (responseFuture == null) {

@@ -64,11 +64,13 @@ public class ClusterSupport<T> implements NotifyListener {
         this.interfaceClass = interfaceClass;
         String urlStr = StringTools.urlDecode(registryUrls.get(0).getParameter(URLParamType.embed.getName()));
         this.url = URL.valueOf(urlStr);
+        //获取protocol的具体实现类DefaultRpcProtocol
         protocol = getDecorateProtocol(url.getProtocol());
     }
 
     public void init() {
         long start = System.currentTimeMillis();
+        //前置的准备
         prepareCluster();
 
         URL subUrl = toSubscribeUrl(url);
@@ -85,7 +87,8 @@ public class ClusterSupport<T> implements NotifyListener {
                 }
             }
 
-            // client 注册自己，同时订阅service列表
+            // client 注册自己,同时订阅service列表
+            //这里是进行服务的订阅,通过zk的watch机制,当服务发生变化,会调用ClusterSupport里面的notify方法进行刷新集群信息
             Registry registry = getRegistry(ru);
             registry.subscribe(subUrl, this);
         }
@@ -170,11 +173,14 @@ public class ClusterSupport<T> implements NotifyListener {
             if (!u.canServe(url)) {
                 continue;
             }
+            //获取Referer实现类
             Referer<T> referer = getExistingReferer(u, registryReferers.get(registryUrl));
+
             if (referer == null) {
-                // careful u: serverURL, refererURL的配置会被serverURL的配置覆盖
                 URL refererURL = u.createCopy();
                 mergeClientConfigs(refererURL);
+                //会去初始化netty客户端 client = endpointFactory.createClient(url);
+                //先调用ProtocolFilterDecorator里面的方法,在调用到AbstractProtocol里面的refer方法
                 referer = protocol.refer(interfaceClass, refererURL, u);
             }
             if (referer != null) {
@@ -189,6 +195,7 @@ public class ClusterSupport<T> implements NotifyListener {
 
         // 此处不销毁referers，由cluster进行销毁
         registryReferers.put(registryUrl, newReferers);
+        //刷新最新的服务到cluster
         refreshCluster();
     }
 
@@ -292,14 +299,18 @@ public class ClusterSupport<T> implements NotifyListener {
 
     @SuppressWarnings("unchecked")
     private void prepareCluster() {
+        //根据url获取到一些配置,包括负载策略和Ha策略
         String clusterName = url.getParameter(URLParamType.cluster.getName(), URLParamType.cluster.getValue());
         String loadbalanceName = url.getParameter(URLParamType.loadbalance.getName(), URLParamType.loadbalance.getValue());
         String haStrategyName = url.getParameter(URLParamType.haStrategy.getName(), URLParamType.haStrategy.getValue());
 
+        //通过SPI机制获取具体的实现类,根据SPI获取cluster的具体实现类:ClusterSpi
         cluster = ExtensionLoader.getExtensionLoader(Cluster.class).getExtension(clusterName);
+        //根据SPI获取负载均衡策略和Ha策略的具体实现
         LoadBalance<T> loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension(loadbalanceName);
         HaStrategy<T> ha = ExtensionLoader.getExtensionLoader(HaStrategy.class).getExtension(haStrategyName);
         ha.setUrl(url);
+        //装载到cluster中
         cluster.setLoadBalance(loadBalance);
         cluster.setHaStrategy(ha);
         cluster.setUrl(url);

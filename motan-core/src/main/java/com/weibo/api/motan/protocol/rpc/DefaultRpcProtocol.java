@@ -38,6 +38,8 @@ public class DefaultRpcProtocol extends AbstractProtocol {
 
     @Override
     protected <T> Exporter<T> createExporter(Provider<T> provider, URL url) {
+
+        //传入DefaultProvider和服务的url
         return new DefaultRpcExporter<T>(provider, url, this.ipPort2RequestRouter, this.exporterMap);
     }
 

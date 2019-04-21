@@ -114,6 +114,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
         checkInterfaceAndMethods(interfaceClass, methods);
 
+        //获取注册中心的详细信息  zookeeper://192.168.88.129:2181/com.weibo.api.motan.registry.RegistryService?group=default_rpc
         List<URL> registryUrls = loadRegistryUrls();
         if (registryUrls == null || registryUrls.size() == 0) {
             throw new IllegalStateException("Should set registry config for service:" + interfaceClass.getName());
@@ -147,6 +148,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
     @SuppressWarnings("unchecked")
     private void doExport(ProtocolConfig protocolConfig, int port, List<URL> registryURLs) {
+        //根据  配置文件  获取 服务的配置  比如接口名称等，再次处理
         String protocolName = protocolConfig.getName();
         if (protocolName == null || protocolName.length() == 0) {
             protocolName = URLParamType.protocol.getValue();
@@ -168,6 +170,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
         collectConfigParams(map, protocolConfig, basicService, extConfig, this);
         collectMethodConfigParams(map, this.getMethods());
 
+        //此处组装服务地址 motan://192.168.174.1:8004/com.weibo.motan.demo.service.MotanDemoService?group=motan-demo-rpc
         URL serviceUrl = new URL(protocolName, hostAddress, port, interfaceClass.getName(), map);
 
         if (serviceExists(serviceUrl)) {
@@ -201,6 +204,7 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
             }
         }
 
+        //给注册url新增embed属性
         for (URL u : urls) {
             u.addParameter(URLParamType.embed.getName(), StringTools.urlEncode(serviceUrl.toFullStr()));
             registereUrls.add(u.createCopy());
@@ -208,6 +212,14 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
 
         ConfigHandler configHandler = ExtensionLoader.getExtensionLoader(ConfigHandler.class).getExtension(MotanConstants.DEFAULT_VALUE);
 
+        /**
+         *
+         * 三个参数的含义:
+         接口名称
+         具体的实现类
+         注册中心url包含embed熟悉(服务的url)
+         *
+         * */
         exporters.add(configHandler.export(interfaceClass, ref, urls));
     }
 

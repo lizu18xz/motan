@@ -72,11 +72,13 @@ public class FailoverHaStrategy<T> extends AbstractHaStrategy<T> {
                 return refer.call(request);
             } catch (RuntimeException e) {
                 // 对于业务异常，直接抛出
+                System.out.println("FailoverHaStrategy Call false for request:%s error=%s"+ request+e.getMessage()+"=="+tryCount);
                 if (ExceptionUtil.isBizException(e)) {
                     throw e;
                 } else if (i >= tryCount) {
                     throw e;
                 }
+                System.out.println("FailoverHaStrategy=== Call false for request:%s error=%s"+ request+e.getMessage()+"=="+tryCount);
                 LoggerUtil.warn(String.format("FailoverHaStrategy Call false for request:%s error=%s", request, e.getMessage()));
             }
         }
@@ -89,6 +91,17 @@ public class FailoverHaStrategy<T> extends AbstractHaStrategy<T> {
         referers.clear();
         loadBalance.selectToHolder(request, referers);
         return referers;
+    }
+
+
+    public static void main(String[] args) {
+        System.out.println(0%5);
+        System.out.println(1%5);
+        System.out.println(2%5);
+        System.out.println(3%5);
+        System.out.println(4%5);
+        System.out.println(5%5);
+        System.out.println(6%5);
     }
 
 }

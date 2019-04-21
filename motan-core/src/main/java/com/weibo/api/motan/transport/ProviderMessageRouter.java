@@ -72,8 +72,10 @@ public class ProviderMessageRouter implements MessageHandler {
 
         Request request = (Request) message;
 
+        //根据具体的请 获取 group/interface/version 来唯一标示一个服务
         String serviceKey = MotanFrameworkUtil.getServiceKey(request);
 
+        //获取具体处理请求的Provider
         Provider<?> provider = providers.get(serviceKey);
 
         if (provider == null) {

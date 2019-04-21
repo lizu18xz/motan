@@ -71,7 +71,6 @@ public class DefaultResponse implements Response, Serializable {
             throw (exception instanceof RuntimeException) ? (RuntimeException) exception : new MotanServiceException(
                     exception.getMessage(), exception);
         }
-
         return value;
     }
 

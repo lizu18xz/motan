@@ -62,7 +62,9 @@ public abstract class AbstractProtocol implements Protocol {
                         MotanErrorMsgConstant.FRAMEWORK_INIT_ERROR);
             }
 
+            //调用 DefaultRpcProtocol 里面具体实现的方法,返回一个 DefaultRpcExporter
             exporter = createExporter(provider, url);
+            //调用DefaultRpcExporter的init方法
             exporter.init();
 
             exporterMap.put(protocolKey, exporter);

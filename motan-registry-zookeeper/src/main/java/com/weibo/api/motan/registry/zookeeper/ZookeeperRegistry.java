@@ -57,6 +57,7 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
             @Override
             public void handleNewSession() throws Exception {
                 LoggerUtil.info("zkRegistry get new session notify.");
+                System.out.println("zkRegistry get new session notify.");
                 reconnectService();
                 reconnectClient();
             }
@@ -85,8 +86,11 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
             IZkChildListener zkChildListener = childChangeListeners.get(serviceListener);
             if (zkChildListener == null) {
                 childChangeListeners.putIfAbsent(serviceListener, new IZkChildListener() {
+                    //对父节点添加监听子节点变化。
+
                     @Override
                     public void handleChildChange(String parentPath, List<String> currentChilds) {
+                        System.out.println("服务有变化!!!!!!!!!!");
                         serviceListener.notifyService(url, getUrl(), nodeChildsToUrls(url, parentPath, currentChilds));
                         LoggerUtil.info(String.format("[ZookeeperRegistry] service list change: path=%s, currentChilds=%s", parentPath, currentChilds.toString()));
                     }
@@ -400,4 +404,10 @@ public class ZookeeperRegistry extends CommandFailbackRegistry implements Closab
     public void close() {
         this.zkClient.close();
     }
+
+    public static void main(String[] args) {
+        System.out.println(ZookeeperRegistry.class);
+    }
+
+
 }
