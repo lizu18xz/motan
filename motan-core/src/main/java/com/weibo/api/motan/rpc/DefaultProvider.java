@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
  * @version 创建时间：2013-5-23
  *
  *provider具体的实现是DefaultProvider,在SimpleConfigHandler里面的export方法就已经被初始化
- *
+ *每个暴露的服务对一个provider
  *  proxyImpl是具体实现类
 url就是上文的服务url
 clz就是服务接口

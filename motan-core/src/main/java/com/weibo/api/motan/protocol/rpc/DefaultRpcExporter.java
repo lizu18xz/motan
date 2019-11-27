@@ -98,6 +98,7 @@ public class DefaultRpcExporter<T> extends AbstractExporter<T> {
     }
 
     protected ProviderMessageRouter initRequestRouter(URL url) {
+        //根据主机和端口 找到ProviderMessageRouter
         String ipPort = url.getServerPortStr();
 
         //处理客户端请求的时候会用到ProviderMessageRouter
@@ -107,6 +108,7 @@ public class DefaultRpcExporter<T> extends AbstractExporter<T> {
             ipPort2RequestRouter.putIfAbsent(ipPort, new ProviderProtectedMessageRouter());
             requestRouter = ipPort2RequestRouter.get(ipPort);
         }
+        //把当前服务的provider加入到providers中    providers.put(serviceKey, provider);
         requestRouter.addProvider(provider);
 
         return requestRouter;

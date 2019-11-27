@@ -60,6 +60,8 @@ public class ProviderMessageRouter implements MessageHandler {
         addProvider(provider);
     }
 
+
+    //NettyChannelHandler  channelRead  收到request请求后会回调此处进行处理
     @Override
     public Object handle(Channel channel, Object message) {
         if (channel == null || message == null) {
@@ -75,7 +77,7 @@ public class ProviderMessageRouter implements MessageHandler {
         //根据具体的请 获取 group/interface/version 来唯一标示一个服务
         String serviceKey = MotanFrameworkUtil.getServiceKey(request);
 
-        //获取具体处理请求的Provider
+        //获取具体处理请求的Provider,获取服务的Provider,默认为DefaultProvider
         Provider<?> provider = providers.get(serviceKey);
 
         if (provider == null) {
@@ -97,6 +99,7 @@ public class ProviderMessageRouter implements MessageHandler {
 
     protected Response call(Request request, Provider<?> provider) {
         try {
+            //最终调用DefaultProvider.invoke(Request request)方法，进行处理请求
             return provider.call(request);
         } catch (Exception e) {
             DefaultResponse response = new DefaultResponse();

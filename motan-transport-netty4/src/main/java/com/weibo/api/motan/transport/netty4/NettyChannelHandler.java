@@ -139,6 +139,7 @@ public class NettyChannelHandler extends ChannelDuplexHandler {
             RpcContext.init(request);
             Object result;
             try {
+                //messageHandler    ===   ProviderMessageRouter
                 result = messageHandler.handle(channel, request);
             } catch (Exception e) {
                 LoggerUtil.error("NettyChannelHandler processRequest fail! request:" + MotanFrameworkUtil.toString(request), e);

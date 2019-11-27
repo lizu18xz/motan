@@ -203,6 +203,7 @@ class ExecutorQueue extends LinkedTransferQueue<Runnable> {
 		if (threadPoolExecutor.getSubmittedTasksCount() <= poolSize) {
 			return super.offer(o);
 		}
+		//判断当前线程池的大小是否小于设置的最大线程池大小,如果小于则会继续给任务创建新的线程进行执行
 		// if we have less threads than maximum force creation of a new
 		// thread
 		if (poolSize < threadPoolExecutor.getMaximumPoolSize()) {
