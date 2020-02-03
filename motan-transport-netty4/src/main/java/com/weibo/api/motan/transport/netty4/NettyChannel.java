@@ -60,6 +60,9 @@ public class NettyChannel implements Channel {
         ChannelFuture writeFuture = this.channel.writeAndFlush(msg);
         boolean result = writeFuture.awaitUninterruptibly(timeout, TimeUnit.MILLISECONDS);
 
+        //误区二： Channel.writeAndFlush 会返回一个 channelFuture，我只需要判断 channelFuture.isSuccess 就可以判断请求是否成功了。
+        //注意，writeAndFlush 成功并不代表对端接受到了请求，返回值为 true 只能保证写入网络缓冲区成功，并不代表发送成功
+
         if (result && writeFuture.isSuccess()) {
             response.addListener(new FutureListener() {
                 @Override
@@ -69,7 +72,7 @@ public class NettyChannel implements Channel {
                         // 成功的调用
                         nettyClient.resetErrorCount();
                     } else {
-                        // 失败的调用
+                        // 失败的调用,失败次数多了会将连接状态改为不可用
                         nettyClient.incrErrorCount();
                     }
                 }

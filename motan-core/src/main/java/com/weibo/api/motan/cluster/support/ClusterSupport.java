@@ -148,6 +148,9 @@ public class ClusterSupport<T> implements NotifyListener {
      * 3 如果该registry对应的referer数量为0，而没有其他可用的referers，那就忽略该次通知；
      * 4 此处对protoco进行decorator处理，当前为增加filters
      * </pre>
+     *
+     *
+     *
      */
     @Override
     public synchronized void notify(URL registryUrl, List<URL> urls) {

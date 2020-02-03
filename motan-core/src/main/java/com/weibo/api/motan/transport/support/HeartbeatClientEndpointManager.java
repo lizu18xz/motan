@@ -63,6 +63,7 @@ public class HeartbeatClientEndpointManager implements EndpointManager{
                         }
 
                         HeartbeatFactory factory = entry.getValue();
+                        //1创建心跳request,2-发送心跳请求
                         endpoint.heartbeat(factory.createRequest());
                     } catch (Exception e) {
                         LoggerUtil.error("HeartbeatEndpointManager send heartbeat Error: url=" + endpoint.getUrl().getUri() + ", " + e.getMessage());

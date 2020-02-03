@@ -47,6 +47,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
     private AtomicLong errorCount = new AtomicLong(0);
 
     public NettyClient(URL url) {
+        //初始化客户端连接池数量
         super(url);
         timeMonitorFuture = scheduledExecutor.scheduleWithFixedDelay(
                 new TimeoutMonitor("timeout_monitor_" + url.getHost() + "_" + url.getPort()),
@@ -65,6 +66,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
 
     @Override
     public Response request(Request request) throws TransportException {
+        //业务请求  先判断是否是存活的,心跳机制会对此状态进行设置。
         if (!isAvailable()) {
             throw new MotanServiceException("NettyChannel is unavailable: url=" + url.getUri() + MotanFrameworkUtil.toString(request));
         }
@@ -133,6 +135,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
      */
     private Response asyncResponse(Response response, boolean async) {
         if (async || !(response instanceof ResponseFuture)) {
+            //心跳消息会异步发送
             return response;
         }
         return new DefaultResponse(response);//同步获取

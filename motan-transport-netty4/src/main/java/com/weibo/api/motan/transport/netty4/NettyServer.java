@@ -35,6 +35,7 @@ public class NettyServer extends AbstractServer implements StatisticCallback {
     private StandardThreadExecutor standardThreadExecutor = null;
 
     public NettyServer(URL url, MessageHandler messageHandler) {
+        //初始化 Codec  DefaultRpcCodec
         super(url);
         this.messageHandler = messageHandler;
     }
@@ -72,14 +73,17 @@ public class NettyServer extends AbstractServer implements StatisticCallback {
             minWorkerThread = url.getIntParameter(URLParamType.minWorkerThread.getName(), MotanConstants.NETTY_SHARECHANNEL_MIN_WORKDER);
             maxWorkerThread = url.getIntParameter(URLParamType.maxWorkerThread.getName(), MotanConstants.NETTY_SHARECHANNEL_MAX_WORKDER);
         } else {
+            // 20 200
             minWorkerThread = url.getIntParameter(URLParamType.minWorkerThread.getName(), MotanConstants.NETTY_NOT_SHARECHANNEL_MIN_WORKDER);
             maxWorkerThread = url.getIntParameter(URLParamType.maxWorkerThread.getName(), MotanConstants.NETTY_NOT_SHARECHANNEL_MAX_WORKDER);
         }
 
+        //server 处理任务的线程池创建和预先启动核心线程
         standardThreadExecutor = (standardThreadExecutor != null && !standardThreadExecutor.isShutdown()) ? standardThreadExecutor
                 : new StandardThreadExecutor(minWorkerThread, maxWorkerThread, workerQueueSize, new DefaultThreadFactory("NettyServer-" + url.getServerPortStr(), true));
         standardThreadExecutor.prestartAllCoreThreads();
 
+        //默认当前server最大的连接数100000  all clients conn  server支持的最大连接数TCP
         channelManage = new NettyServerChannelManage(maxServerConnection);
 
         ServerBootstrap serverBootstrap = new ServerBootstrap();

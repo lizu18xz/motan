@@ -95,9 +95,11 @@ public class DefaultRpcHeartbeatFactory implements HeartbeatFactory {
 
         @Override
         public Object handle(Channel channel, Object message) {
+            //判断是否是HeartbeatRequest,如果是则直接从这里进行返回
             if (isHeartbeatRequest(message)) {
                 return getDefaultHeartbeatResponse(((Request)message).getRequestId());
             }
+            //如果不是则直接处理业务的请求
             return messageHandler.handle(channel, message);
         }
 

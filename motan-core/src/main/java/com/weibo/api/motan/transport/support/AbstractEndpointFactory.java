@@ -67,12 +67,14 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
     private EndpointManager heartbeatClientEndpointManager = null;
 
     public AbstractEndpointFactory() {
+        // 心跳的管理
         heartbeatClientEndpointManager = new HeartbeatClientEndpointManager();
         heartbeatClientEndpointManager.init();
     }
 
     @Override
     public Server createServer(URL url, MessageHandler messageHandler) {
+        //包装了原有的handler,为了处理心跳的消息
         messageHandler = getHeartbeatFactory(url).wrapMessageHandler(messageHandler);
 
         synchronized (ipPort2ServerShareChannel) {
@@ -91,10 +93,11 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
 
             LoggerUtil.info(this.getClass().getSimpleName() + " create share_channel server: url={}", url);
 
+            //共享端口的情况:通过ipPort获取到已经存在的server
             Server server = ipPort2ServerShareChannel.get(ipPort);
 
             if (server != null) {
-                // can't share service channel
+                // can't share service channel 校验是否符合共享端口的条件
                 if (!MotanFrameworkUtil.checkIfCanShareServiceChannel(server.getUrl(), url)) {
                     throw new MotanFrameworkException(
                             "Service export Error: share channel but some config param is different, protocol or codec or serialize or maxContentLength or maxServerConnection or maxWorkerThread or heartbeatFactory, source="
@@ -194,6 +197,7 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
     private Client createClient(URL url, EndpointManager endpointManager) {
         Client client = innerCreateClient(url);
 
+        //将创建的客户端进行统一心跳管理
         endpointManager.addEndpoint(client);
 
         return client;
